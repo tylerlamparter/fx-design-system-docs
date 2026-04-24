@@ -82,7 +82,8 @@ All scripts read the GitBook API token from the `GITBOOK_TOKEN` environment vari
 ```bash
 export GITBOOK_TOKEN=gb_api_...   # any user token with admin on the space
 ./scripts/import.sh
-./scripts/publish.sh              # only needed once after major nav changes
+./scripts/publish.sh              # always run after import — git-import flips
+                                  # the site back to published:false
 ```
 
 ## How this site was built
