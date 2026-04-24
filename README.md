@@ -1,37 +1,98 @@
+# Celigo FX Design System — Docs Source
+
+Markdown source for the **Celigo FX Design System** documentation site published on GitBook.
+
+- **Published site:** https://celigo.gitbook.io/celigo-design-system/
+- **GitBook space:** Docs (`6dVG2kxXhCSgs2Z18izG`) in the [Celigo Design System site](https://app.gitbook.com/o/hCx98aEWAei7dMUCu0xj/sites/site_TeB44)
+- **Component library:** [`@celigo/fuse-ui`](https://github.com/celigo/fuse-ui) — components live there, *docs* live here
+- **Storybook:** https://celigo.github.io/fuse-ui-feature/
+
+Modeled after [shadcn/ui's docs structure](https://ui.shadcn.com/docs/components/radix/button): one page per component with a consistent layout (Preview → Usage → Examples → Variants & States → Props → Tokens → Guidelines → A11y → Related).
+
 ---
-icon: sparkles
-description: A library of accessible, consistent React components for Celigo product experiences.
+
+## Repo layout
+
+```
+docs/                    ← published to GitBook
+  README.md              Introduction (site home)
+  SUMMARY.md             Navigation
+  installation.md
+  components/
+    README.md            Components overview
+    button.md
+  assets/
+    button-preview.png   Figma export of node 16:42
+
+scripts/
+  import.sh              Re-trigger GitBook git-import
+  publish.sh             Publish the site (idempotent)
+```
+
+The site is fed from `docs/` via GitBook's `repoProjectDirectory` config so the project README and tooling can live at the repo root without polluting the published nav.
+
+## Authoring
+
+Every page in `docs/` is a regular markdown file. Front-matter at the top sets the page icon and description shown in the GitBook nav:
+
+```markdown
+---
+icon: circle-dot
+description: A labelled action trigger for primary, secondary, outline, or ghost actions.
 ---
 
-# Introduction
+# Button
+...
+```
 
-The **Celigo FX Design System** is the single source of truth for the components, tokens, and patterns used across Celigo's product surface. It is designed to help teams build fast, accessible, and visually consistent experiences without reinventing primitives for every new feature.
+GitBook-flavoured blocks are supported and render as native components in the published site:
 
-{% hint style="info" %}
-This site is the **documentation** — the components themselves live in the [`@celigo/fuse-ui`](https://github.com/celigo/fuse-ui) package and are showcased in [Storybook](https://celigo.github.io/fuse-ui-feature/).
-{% endhint %}
+| Block | Use for |
+| - | - |
+| `{% hint style="info" %}` | Callouts, tips, warnings |
+| `{% tabs %}` ... `{% tab title="npm" %}` | Code-snippet alternatives |
+| `<figure>...<figcaption>` | Captioned screenshots |
+| HTML tables | Props tables, token tables |
 
-## What's inside
+## Adding a new component
 
-* **Components** — Buttons, inputs, selects, dialogs, and more. Each comes with API reference, usage guidelines, and accessibility notes.
-* **Design tokens** — The shared color, typography, spacing, radius, and shadow values that all components consume.
-* **Patterns** — Opinionated guidance for common UI scenarios: empty states, confirmations, destructive actions, disabled controls.
+1. **Create** `docs/components/<name>.md` — copy `button.md` as a template; the section structure is the convention.
+2. **Add an asset** at `docs/assets/<name>-preview.png` — pull from Figma (`get_screenshot` MCP) and reference as `../assets/<name>-preview.png`.
+3. **Update nav** in `docs/SUMMARY.md` — add the new component under the `## Components` heading.
+4. **Commit and push** to `main`.
+5. **Re-import** by running `scripts/import.sh` (or wait for the next scheduled sync).
+6. **Verify** at https://celigo.gitbook.io/celigo-design-system/components/<name>.
 
-## How to use this site
+## Local preview
 
-If you're…
+GitBook's git-sync is the source of truth — there's no local preview server. Either:
 
-* **Starting a new screen** — jump to [Installation](installation.md), then browse [Components](components/) to find the primitives you need.
-* **Implementing a Figma design** — each component page shows the matching Figma node and the exact props to reach for.
-* **Deciding between two components** — the "Related components" section at the bottom of each page is usually the fastest way to resolve it.
+- Push a draft branch and create a [GitBook change request](https://gitbook.com/docs/collaboration/change-requests) targeting that branch, **or**
+- Render markdown locally with VS Code's preview to sanity-check structure (GitBook-specific blocks won't render, but everything else will).
 
-## Principles
+## Scripts
 
-1. **Accessible by default.** Every interactive component ships with focus rings, keyboard support, and proper semantics. You should not have to think about ARIA roles for standard use.
-2. **One canonical way.** For each UI need, there is one component and one recommended pattern. Variants exist for emphasis, not for taste.
-3. **Tokens over values.** Colors, spacing, and radii always come from design tokens — never raw hex or pixel values.
-4. **Progressive disclosure.** Components have sensible defaults. You only reach for props when you genuinely need to deviate.
+All scripts read the GitBook API token from the `GITBOOK_TOKEN` environment variable.
 
-## Contributing
+| Script | What it does |
+| - | - |
+| `scripts/import.sh` | Triggers `POST /spaces/{id}/git/import` to pull the latest commit |
+| `scripts/publish.sh` | Calls `POST /orgs/{orgId}/sites/{siteId}/publish` (idempotent) |
 
-The design system is maintained by the FX team. File issues, propose changes, and track roadmap work in the [`celigo/fuse-ui`](https://github.com/celigo/fuse-ui) repository.
+```bash
+export GITBOOK_TOKEN=gb_api_...   # any user token with admin on the space
+./scripts/import.sh
+./scripts/publish.sh              # only needed once after major nav changes
+```
+
+## How this site was built
+
+- **Space:** `6dVG2kxXhCSgs2Z18izG` (the pre-existing "Docs" space inside the [Celigo Design System site](https://app.gitbook.com/o/hCx98aEWAei7dMUCu0xj/sites/site_TeB44)).
+- **Content:** Imported from this repo via `POST /v1/spaces/{spaceId}/git/import` with `url` pointing at the public GitHub repo and `ref: refs/heads/main`.
+- **Hierarchy:** Driven by filesystem layout — `README.md` is the section root, `SUMMARY.md` controls nav, subfolders become groups (`docs/components/` → "Components" group).
+- **Assets:** PNGs in `docs/assets/` are uploaded into GitBook's storage on import and served from its CDN.
+- **Publishing:** `POST /v1/orgs/{orgId}/sites/{siteId}/publish` flips the site to `published: true`. Access is via the share-link at `urls.published`.
+
+## License
+
+Internal Celigo content. Not for external redistribution.
