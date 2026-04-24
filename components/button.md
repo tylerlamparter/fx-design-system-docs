@@ -13,7 +13,7 @@ Use `Button` anywhere the user takes an action. For navigation between pages, us
 
 ## Preview
 
-<figure><img src="https://celigo.github.io/fuse-ui-feature/images/buttons-preview.png" alt="Button variants — Primary, Secondary, Outline, and Ghost across all four sizes"><figcaption><p>The four <code>Button</code> types at <code>md</code> size, with and without leading icons.</p></figcaption></figure>
+<figure><img src="../assets/button-preview.png" alt="Every Button variant — Primary, Secondary, Outline, and Ghost, each in default and destructive, across Default, Hover, Focused, and Disabled states"><figcaption><p>The full <code>Button</code> matrix: the four types — <code>Primary</code>, <code>Secondary</code>, <code>Outline</code>, <code>Ghost</code> — each in default and destructive variants, across all four interactive states.</p></figcaption></figure>
 
 {% hint style="info" %}
 Live examples are available in [Storybook](https://celigo.github.io/fuse-ui-feature/?path=/story/components-buttons-fx--text-buttons) and the matching Figma node is `16:42` in the FX Design System Library (file `9Sy3F3jd4vEW58w1tC2FTu`).
